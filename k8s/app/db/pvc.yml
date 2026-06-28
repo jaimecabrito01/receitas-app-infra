@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc             # Mantive o nome 'pvc' para bater com o seu Deployment do Mongo
+  namespace: energia-slz # IMPORTANTE: O PVC precisa estar no mesmo namespace do Mongo!
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi     # 1 Gigabyte é perfeito para os testes do seu amigo

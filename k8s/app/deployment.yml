@@ -1,6 +1,5 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: energia-slz
   namespace: energia-slz
@@ -8,27 +7,30 @@ metadata:
     tier: backend
   annotations:
     description: "Backend app"
-
 spec:
   replicas: 1
-
   selector:
     matchLabels:
       app: energia-slz
-
-  strategy:
-    type: RollingUpdate
-
   template:
     metadata:
       labels:
         app: energia-slz
-
     spec:
       containers:
         - name: energia-slz
           image: ghcr.io/eugeancarlos/energia-slz:latest
-
           ports:
-            - containerPort: 8080      
+            - containerPort: 8080
+          env:
+            # 1. Mantém apenas a chave do Gemini (que ainda é obrigatória)
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: gemini-key
+
+            # 2. A URI do Mongo limpa, apontando direto para o Service do banco
+            - name: MONGO_URI
+              value: "mongodb://mongo:27017/energia_db"   
     
