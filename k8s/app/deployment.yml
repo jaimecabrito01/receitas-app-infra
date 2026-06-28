@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: energia-slz
-  namespace: energia-slz
+  name: receitas-app
+  namespace: receitas-app
   labels:
     tier: backend
   annotations:
@@ -11,26 +11,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: energia-slz
+      app: receitas-app
   template:
     metadata:
       labels:
-        app: energia-slz
+        app: receitas-app
     spec:
       containers:
-        - name: energia-slz
-          image: ghcr.io/eugeancarlos/energia-slz:latest
+        - name: receitas-app-backend
+          image: ghcr.io/jaimecabrito01/Api-receitas-backend:latest
           ports:
             - containerPort: 8080
-          env:
-            # 1. Mantém apenas a chave do Gemini (que ainda é obrigatória)
-            - name: GEMINI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: app-secrets
-                  key: gemini-key
 
-            # 2. A URI do Mongo limpa, apontando direto para o Service do banco
-            - name: MONGO_URI
-              value: "mongodb://mongo:27017/energia_db"   
-    
