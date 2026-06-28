@@ -1,44 +1,49 @@
-# EnergIA-slz-fullstack-infra
+# receitas-app-infra
 
 ```mermaid
 flowchart TB
 
-    USER[Usuário]
+USER[Usuário]
 
-    GH[GitHub]
-    GHA[GitHub Actions]
-    CR[GHCR / Docker Registry]
-    ARGO[ArgoCD]
+GH[GitHub]
+GHA[GitHub Actions]
+CR[GHCR / Docker Registry]
+ARGO[ArgoCD]
 
-    USER --> TRAEFIK
+%% Fluxo de Acesso do Usuário
+USER --> TRAEFIK
 
-    GH --> GHA
-    GHA --> CR
-    CR --> ARGO
+%% Fluxo de CI/CD (GitOps)
+GH --> GHA
+GHA --> CR
+CR --> ARGO
 
-    subgraph K8S["Kubernetes Cluster"]
+subgraph K8S["Kubernetes Cluster"]
 
-        TRAEFIK[Traefik Ingress Controller]
+    TRAEFIK[Traefik Ingress Controller]
 
-        subgraph APP["Namespace: energia-slz"]
-
-            SPRING[Spring Boot API]
-
-            MONGO[(MongoDB StatefulSet)]
-
-        end
-
-        subgraph OPS["Namespace: argocd"]
-
-            ARGO_INTERNAL[ArgoCD]
-
-        end
-
-        TRAEFIK --> SPRING
-        SPRING --> MONGO
+    subgraph APP["Namespace: energia-slz"]
+        
+        VUE[Frontend: Vue.js]
+        SPRING[Backend: Spring Boot API]
+        POSTGRES[(PostgreSQL StatefulSet / Deployment)]
 
     end
 
-    ARGO --> ARGO_INTERNAL
+    subgraph OPS["Namespace: argocd"]
+
+        ARGO_INTERNAL[ArgoCD]
+
+    end
+
+    %% Fluxo de Comunicação Interna
+    TRAEFIK --> VUE
+    VUE --> SPRING
+    SPRING --> POSTGRES
+
+end
+
+%% ArgoCD aplicando as mudanças no Cluster
+ARGO --> ARGO_INTERNAL
 ```
 
