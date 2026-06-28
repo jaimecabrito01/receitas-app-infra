@@ -49,11 +49,11 @@ spec:
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
-  volumeClaimTemplates: [] # Usando o PVC declarado acima ou embutido aqui
       volumes:
       - name: postgres-storage
         persistentVolumeClaim:
           claimName: postgres-pvc
+  volumeClaimTemplates: []
 ---
 apiVersion: v1
 kind: Service
