@@ -22,7 +22,7 @@ subgraph K8S["Kubernetes Cluster"]
 
     TRAEFIK[Traefik Ingress Controller]
 
-    subgraph APP["Namespace: energia-slz"]
+    subgraph APP["Namespace: receitas-app "]
         
         VUE[Frontend: Vue.js]
         SPRING[Backend: Spring Boot API]
