@@ -17,6 +17,17 @@ GitOps repo for a recipe app stack (Vue.js frontend + Spring Boot API + PostgreS
 
 The backend has a ClusterIP Service (`receitas-app-service:8080`) but **no Ingress**. No external route yet.
 
+## ArgoCD sync-wave order
+
+Resources annotated with `argocd.argoproj.io/sync-wave` to enforce creation order:
+
+| Wave | Resources |
+|------|-----------|
+| `"0"` | Namespace `receitas-app` |
+| `"1"` | Secret `postgres-credentials`, PVC `postgres-pvc` |
+| `"2"` | Deployments (backend, frontend), StatefulSet (PostgreSQL) |
+| `"3"` | ClusterIP Services (postgres, backend, frontend) |
+
 ## Deploy
 
 ArgoCD syncs from the `k8s/` directory in this repo. No CI workflows in-repo.

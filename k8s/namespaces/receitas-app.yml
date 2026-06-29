@@ -8,3 +8,5 @@ metadata:
     app: receitas-app
     environment: development
     managed-by: kubernetes
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"

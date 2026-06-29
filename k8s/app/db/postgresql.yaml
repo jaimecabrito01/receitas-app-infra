@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
   namespace: receitas-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -15,6 +17,8 @@ kind: StatefulSet
 metadata:
   name: postgres
   namespace: receitas-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   serviceName: "postgres-service"
   replicas: 1
@@ -60,6 +64,8 @@ kind: Service
 metadata:
   name: postgres-service
   namespace: receitas-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   type: ClusterIP # Fica isolado do mundo exterior, seguro dentro do cluster
   ports:

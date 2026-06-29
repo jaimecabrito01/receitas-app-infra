@@ -6,6 +6,7 @@ metadata:
   labels:
     tier: frontend
   annotations:
+    argocd.argoproj.io/sync-wave: "2"
     description: "Frontend app"
 spec:
   replicas: 1
@@ -28,6 +29,8 @@ kind: Service
 metadata:
   name: receitas-app-frontend-service
   namespace: receitas-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   type: ClusterIP
   ports:

@@ -6,6 +6,7 @@ metadata:
   labels:
     tier: backend
   annotations:
+    argocd.argoproj.io/sync-wave: "2"
     description: "Backend app"
 spec:
   replicas: 1
@@ -53,6 +54,8 @@ kind: Service
 metadata:
   name: receitas-app-service
   namespace: receitas-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   type: ClusterIP
   ports:
