@@ -6,5 +6,5 @@ resources:
   - deployment.yml
   - frontend.yml
   - db/postgresql.yaml
-  - security/jwt-seleadsecret.yaml
-  - security/postgres-seleadsecret.yaml
+  - security/jwt-sealedsecret.yaml
+  - security/postgres-sealedsecret.yaml
