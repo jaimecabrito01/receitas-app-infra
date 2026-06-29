@@ -23,10 +23,8 @@ Resources annotated with `argocd.argoproj.io/sync-wave` to enforce creation orde
 
 | Wave | Resources |
 |------|-----------|
-| `"0"` | Namespace `receitas-app` |
-| `"1"` | Secret `postgres-credentials`, PVC `postgres-pvc` |
-| `"2"` | Deployments (backend, frontend), StatefulSet (PostgreSQL) |
-| `"3"` | ClusterIP Services (postgres, backend, frontend) |
+| `"-1"` | Namespace `receitas-app` |
+| `"0"` | Secret `postgres-credentials`, PVC `postgres-pvc`, Deployments (backend, frontend), StatefulSet (PostgreSQL), ClusterIP Services (postgres, backend, frontend) |
 
 ## Deploy
 
