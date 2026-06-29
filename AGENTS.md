@@ -1,31 +1,40 @@
 # receitas-app-infra
 
-GitOps repo for a recipe app stack (Vue.js frontend + Spring Boot API + PostgreSQL) deployed on a Kubernetes cluster via ArgoCD.
+GitOps repo for a recipe app stack (Vue.js frontend + Spring Boot API + PostgreSQL) deployed via ArgoCD.
 
-## Structure
+## Entry point
 
-- `k8s/app/` — main app manifests (namespace: `receitas-app`)
-  - `deployment.yml` — Spring Boot backend (image `ghcr.io/jaimecabrito01/Api-receitas-backend:latest`, port 8080)
-  - `frontend.yml` — Vue.js frontend Deployment (image `ghcr.io/jaimecabrito01/api-receitas-frontend:latest`, port 80) + ClusterIP Service (port 80)
-  - `db/postgresql.yaml` — PostgreSQL 15-alpine StatefulSet, PVC (2Gi), ClusterIP Service (port 5432)
-    - DB name: `energia_db`; credentials from Secret `postgres-credentials` (keys: `username`, `password`)
-  - `db/postgres-secret.yaml` — Secret `postgres-credentials` (namespace `receitas-app`)
-    - **Apenas para dev local.** Não commitar secrets reais no repo.
-- `k8s/namespaces/energia.yml` — separate `energia-slz` namespace (unrelated to the main app)
+`k8s/app/kustomization.yaml` — the Kustomize root ArgoCD syncs from `k8s/`.
 
-## Missing manifests
+## Secrets
 
-The backend has a ClusterIP Service (`receitas-app-service:8080`) but **no Ingress**. No external route yet.
+Bitnami SealedSecrets, **not** plain Secrets. Regenerate locally with:
 
-## ArgoCD sync-wave order
+```bash
+./k8s/app/security/seal-secrets.sh
+```
 
-Resources annotated with `argocd.argoproj.io/sync-wave` to enforce creation order:
+Requires `kubeseal` and a running cluster with the SealedSecrets controller in `kube-system`.
 
-| Wave | Resources |
-|------|-----------|
-| `"-1"` | Namespace `receitas-app` |
-| `"0"` | Secret `postgres-credentials`, PVC `postgres-pvc`, Deployments (backend, frontend), StatefulSet (PostgreSQL), ClusterIP Services (postgres, backend, frontend) |
+- `postgres-sealedsecret.yaml` — DB credentials (`username`, `password` for `energia_db`)
+- `jwt-sealedsecret.yaml` — JWT keypair (`app.key`, `app.pub`) mounted at `/etc/jwt` by the backend
+
+## Namespaces
+
+Two namespace manifests exist; the wave `-1` one (`k8s/namespaces/receitas-app.yml`) bootstraps the namespace before Kustomize applies wave `0` resources:
+
+| Wave | Scope |
+|------|-------|
+| `"-1"` | `k8s/namespaces/receitas-app.yml` — namespace bootstrap |
+| `"0"` | Everything in `k8s/app/kustomization.yaml` (deployments, services, PVC, StatefulSet, SealedSecrets) |
+
+## Architecture
+
+- **Backend** — `ghcr.io/jaimecabrito01/api-receitas-backend:latest`, port 8080, ClusterIP `receitas-app-service`. Connects to `postgres-service:5432/energia_db`. Mounts JWT keys from SealedSecret.
+- **Frontend** — `ghcr.io/jaimecabrito01/api-receitas-frontend:latest`, port 80, ClusterIP `receitas-app-frontend-service`.
+- **PostgreSQL** — `postgres:15-alpine` StatefulSet with PVC (2Gi), ClusterIP `postgres-service:5432`.
+- **No Ingress yet** — Traefik is expected as the ingress controller (from README diagram).
 
 ## Deploy
 
-ArgoCD syncs from the `k8s/` directory in this repo. No CI workflows in-repo.
+ArgoCD auto-syncs from this repo. No CI workflows live here — GitHub Actions builds images to GHCR externally.
