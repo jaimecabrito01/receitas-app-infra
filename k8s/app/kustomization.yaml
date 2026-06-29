@@ -7,4 +7,4 @@ resources:
   - frontend.yml
   - db/postgresql.yaml
   - security/jwt-seleadsecret.yaml
-  - security/postres-seleadsecret.yaml
+  - security/postgres-seleadsecret.yaml
