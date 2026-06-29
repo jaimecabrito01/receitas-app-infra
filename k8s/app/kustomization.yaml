@@ -4,6 +4,6 @@ kind: Kustomization
 resources:
   - deployment.yml
   - frontend.yml
-  - db/postgres-deployment.yml
-  - db/postgres-service.yml
+  - db/postgresql.yaml
+  - db/postgres-secret.yaml
   - ../namespaces/receita.yml
