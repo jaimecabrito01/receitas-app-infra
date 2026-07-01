@@ -5,74 +5,27 @@ Repositório GitOps para o **Receitas App** — uma aplicação de receitas com 
 ## Arquitetura
 
 ```mermaid
-flowchart TB
-
-    GH[GitHub - Este Repositório]
-    GHA[GitHub Actions]
-    CR[GHCR - Imagens Container]
-
-    subgraph K8S_CLUSTER["Kubernetes Cluster"]
-
-        subgraph ARGO_APPS["ArgoCD Applications"]
-            APP_REC[Application: receitas-app\nk8s/app/kustomization.yaml]
-            APP_TRAEFIK[Application: traefik\nk8s/traefik/kustomization.yaml]
-        end
-
-        ARGO[ArgoCD Controller]
-
-        subgraph BOOTSTRAP["Wave -1"]
-            NS_MANIFEST[k8s/namespaces/receitas-app.yml]
-        end
-
+graph TB
+    subgraph CLUSTER["Kubernetes Cluster"]
         subgraph NS_TRAEFIK["Namespace: traefik"]
-            TRAEFIK_DEPLOY[Traefik Deployment\nv3.1]
-            TRAEFIK_SVC[Traefik Service\nLoadBalancer :80 / :443]
+            TRAEFIK_SVC[Traefik\nLoadBalancer :80/:443]
         end
 
-        subgraph NS_APP["Namespace: receitas-app"]
-            subgraph FRONTEND["Wave 0"]
-                VUE[Frontend: Vue.js\nreceitas-app-frontend-service:80]
-            end
+        subgraph NS_REC["Namespace: receitas-app"]
+            IR[IngressRoute] --> VUE[Frontend: Vue.js\nreceitas-app-frontend-service:80]
+            VUE --> SPRING[Backend: Spring Boot\nreceitas-app-service:8080]
+            SPRING --> PG[(PostgreSQL 15-alpine\npostgres-service:5432\nPVC 2Gi)]
 
-            subgraph BACKEND["Wave 0"]
-                SPRING[Backend: Spring Boot\nreceitas-app-service:8080]
-            end
+            JWT_SEC[\SealedSecret\njwt-keys/]
+            DB_SEC[\SealedSecret\npostgres-credentials/]
 
-            subgraph DATABASE["Wave 0"]
-                PG[(PostgreSQL 15-alpine\npostgres-service:5432\nPVC 2Gi)]
-            end
-
-            subgraph SECRETS["Wave 0"]
-                JWT_SEC[SealedSecret: jwt-keys\n/etc/jwt]
-                DB_SEC[SealedSecret: postgres-credentials\nusername / password]
-            end
-
-            IR[IngressRoute catch-all\n→ receitas-app-frontend-service:80]
+            SPRING -.->|monta /etc/jwt| JWT_SEC
+            PG -.->|username / password| DB_SEC
         end
     end
 
-    GH --> ARGO
-    GHA --> CR
-    GH -.->|push| APP_REC
-    GH -.->|push| APP_TRAEFIK
-    APP_REC --> ARGO
-    APP_TRAEFIK --> ARGO
-    ARGO -.->|sync wave -1| NS_MANIFEST
-    NS_MANIFEST -.->|cria| NS_APP
-    ARGO -.->|sync wave 0| TRAEFIK_DEPLOY
-    ARGO -.->|sync wave 0| TRAEFIK_SVC
-    ARGO -.->|sync wave 0| FRONTEND
-    ARGO -.->|sync wave 0| BACKEND
-    ARGO -.->|sync wave 0| DATABASE
-    ARGO -.->|sync wave 0| SECRETS
-    ARGO -.->|sync wave 0| IR
-
+    INTERNET((Internet\ncloudflared)) --> TRAEFIK_SVC
     TRAEFIK_SVC --> IR
-    IR --> VUE
-    VUE --> SPRING
-    SPRING --> PG
-    SPRING -.->|monta| JWT_SEC
-    PG -.->|usa| DB_SEC
 ```
 
 ## Estrutura do repositório
