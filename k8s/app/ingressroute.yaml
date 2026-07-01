@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: receitas-app-ingress
+  namespace: receitas-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: HostSNI(`*`)
+      services:
+        - name: receitas-app-frontend-service
+          port: 80

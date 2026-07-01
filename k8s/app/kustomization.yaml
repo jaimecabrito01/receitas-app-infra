@@ -5,6 +5,7 @@ resources:
   - receitas-app.yml
   - deployment.yml
   - frontend.yml
+  - ingressroute.yaml
   - db/postgresql.yaml
   - security/jwt-sealedsecret.yaml
   - security/postgres-sealedsecret.yaml
