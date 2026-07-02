@@ -38,6 +38,7 @@ k8s/
 │   ├── deployment.yml                  ←   Backend Deployment + ClusterIP Service (8080)
 │   ├── frontend.yml                    ←   Frontend Deployment + ClusterIP Service (80)
 │   ├── ingressroute.yaml               ←   Traefik IngressRoute (catch-all → frontend)
+│   ├── argocd-ingressroute.yaml        ←   Rota /argocd → ArgoCD dashboard
 │   ├── db/
 │   │   └── postgresql.yaml             ←   PVC 2Gi + StatefulSet + ClusterIP Service (5432)
 │   └── security/
@@ -48,8 +49,11 @@ k8s/
 │   ├── kustomization.yaml              ←   Lista todos os resources
 │   ├── namespace.yaml                  ←   Namespace traefik
 │   ├── rbac.yaml                       ←   ServiceAccount + ClusterRole + Binding
-│   ├── deployment.yaml                 ←   Traefik Deployment (v3.1, portas 80/443)
-│   └── service.yaml                    ←   LoadBalancer Service (portas 80/443)
+│   ├── deployment.yaml                 ←   Traefik Deployment (v3.1, portas 80/443/8080)
+│   ├── service.yaml                    ←   LoadBalancer Service (portas 80/443)
+│   └── dashboard-ingressroute.yaml     ←   Rota /dashboard → dashboard Traefik
+├── argocd/                             ← Application manifests para o ArgoCD
+│   └── applications.yaml              ←   Applications: receitas-app + traefik
 └── namespaces/
     └── receitas-app.yml                ← Namespace bootstrap (wave -1, fora do kustomize)
 ```
@@ -61,7 +65,15 @@ k8s/
 | Frontend | `ghcr.io/jaimecabrito01/api-receitas-frontend:latest` | 80 | `receitas-app-frontend-service` (ClusterIP) | Vue.js |
 | Backend | `ghcr.io/jaimecabrito01/api-receitas-backend:latest` | 8080 | `receitas-app-service` (ClusterIP) | Spring Boot. Conecta a `postgres-service:5432/energia_db`. Monta JWT keys de `/etc/jwt`. |
 | PostgreSQL | `postgres:15-alpine` | 5432 | `postgres-service` (ClusterIP) | StatefulSet + PVC 2Gi. Database: `energia_db`. |
-| Traefik | `traefik:v3.1` | 80 / 443 | `traefik` (LoadBalancer) | Ingress controller. Roteia tráfego para o frontend via IngressRoute. |
+| Traefik | `traefik:v3.1` | 80 / 443 / 8080 | `traefik` (LoadBalancer) | Ingress controller. Dashboard interno em :8080. |
+
+## Rotas
+
+| Path | Destino | Acesso |
+|---|---|---|
+| `/*` | `receitas-app-frontend-service:80` (Frontend) | Público (cloudflared) |
+| `/dashboard` | `api@internal` (Dashboard Traefik) | Interno |
+| `/argocd` | `argocd-server:443` (Dashboard ArgoCD) | Interno |
 
 ## Sync-waves
 
@@ -108,26 +120,34 @@ GitHub Actions (externo a este repo) builda imagens → GHCR
 ArgoCD detecta drift no cluster vs. branch main
          ↓
 ArgoCD sync dos Applications:
-  ├── traefik (k8s/traefik/)  → namespace + RBAC + Deployment + Service
-  └── receitas-app (k8s/app/) → wave -1 (namespace) → wave 0 (app + secrets + IngressRoute)
+  ├── traefik (k8s/traefik/)  → namespace + RBAC + Deployment + Service + dashboard
+  └── receitas-app (k8s/app/) → wave -1 (namespace) → wave 0 (app + secrets + rotas)
          ↓
 Cluster atualizado
 ```
 
 > Este repositório contém **apenas os manifests**. As imagens das aplicações são buildadas por um pipeline externo de CI/CD.
 
-## Traefik
+## Bootstrap (cluster novo)
 
-O ingress controller **Traefik v3.1** é deployado a partir de `k8s/traefik/kustomization.yaml` como um Application separado no ArgoCD.
+Para provisionar um cluster Kubernetes do zero:
 
-- Provider: `kubernetescrd` (lê IngressRoutes, Middlewares, etc.)
-- Entrypoints: `web` (:80), `websecure` (:443)
-- Service tipo **LoadBalancer** expondo as portas 80 e 443
-- O IngressRoute em `k8s/app/ingressroute.yaml` roteia **todo o tráfego HTTP** (catch-all) para o frontend (`receitas-app-frontend-service:80`)
-- Para expor à internet, use **cloudflared** ou similar apontando para o LoadBalancer do Traefik
+```bash
+git clone git@github.com:jaimecabrito01/receitas-app-infra.git
+cd receitas-app-infra
+./bootstrap.sh
+```
+
+O script instala:
+- **ArgoCD** — controller GitOps
+- **SealedSecrets** — controller para descriptografar secrets
+- **CRDs do Traefik** — para IngressRoutes funcionarem
+- **Application manifests** em `k8s/argocd/applications.yaml` — apontam para os dois roots do repo
+
+Após o bootstrap, o ArgoCD auto-sincroniza os Applications e o cluster fica pronto.
 
 ## Observações
 
 - **Ajuste de caminho**: o script `seal-secrets.sh` referencia `../../../../dev/java/Api-receitas/`. Se o repositório da API estiver em outro local, atualize o `REPO_DIR` no script.
 - **Dev local**: as credenciais do PostgreSQL (`admin`/`admin123`) são hardcoded no script de seal. Não usar em produção.
-- **ArgoCD Applications**: `k8s/app/` e `k8s/traefik/` são dois Kustomize roots distintos. Crie um Application no ArgoCD para cada um.
+- **ArgoCD Applications**: `k8s/app/` e `k8s/traefik/` são dois Kustomize roots distintos. O bootstrap cria um Application no ArgoCD para cada um.

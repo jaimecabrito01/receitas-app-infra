@@ -45,4 +45,24 @@ The `traefik` namespace is created by `k8s/traefik/namespace.yaml`.
 
 ## Deploy
 
+
+## Bootstrap (cluster novo)
+
+
+
+```bash
+
+git clone git@github.com:jaimecabrito01/receitas-app-infra.git
+
+cd receitas-app-infra
+
+./bootstrap.sh
+
+```
+
+
+
+Instala ArgoCD + SealedSecrets + Traefik CRDs e cria os Applications.
+
+
 ArgoCD auto-syncs from this repo (two Applications). No CI workflows live here — GitHub Actions builds images to GHCR externally.
