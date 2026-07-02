@@ -3,7 +3,7 @@ set -e
 
 NAMESPACE="receitas-app"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_DIR="$(cd "$SCRIPT_DIR/../../../../dev/java/Api-receitas" && pwd)"
+KEYS_DIR="$SCRIPT_DIR/jwt-keys"
 
 if ! command -v kubeseal &>/dev/null; then
   echo "Erro: kubeseal não encontrado. Instale com:"
@@ -13,18 +13,20 @@ if ! command -v kubeseal &>/dev/null; then
 fi
 
 echo "=== JWT Keys ==="
-KEY_FILE="$REPO_DIR/api/src/main/resources/app.key"
-PUB_FILE="$REPO_DIR/api/src/main/resources/app.pub"
+mkdir -p "$KEYS_DIR"
 
-if [ ! -f "$KEY_FILE" ] || [ ! -f "$PUB_FILE" ]; then
-  echo "Erro: arquivos de chave não encontrados em $REPO_DIR/api/src/main/resources/"
-  exit 1
+if [ ! -f "$KEYS_DIR/app.key" ] || [ ! -f "$KEYS_DIR/app.pub" ]; then
+  echo "Gerando par de chaves JWT em $KEYS_DIR"
+  openssl genrsa -out "$KEYS_DIR/app.key" 2048
+  openssl rsa -in "$KEYS_DIR/app.key" -pubout -out "$KEYS_DIR/app.pub"
+else
+  echo "Usando chaves existentes em $KEYS_DIR"
 fi
 
 kubectl create secret generic jwt-keys \
   -n "$NAMESPACE" \
-  --from-file=app.key="$KEY_FILE" \
-  --from-file=app.pub="$PUB_FILE" \
+  --from-file=app.key="$KEYS_DIR/app.key" \
+  --from-file=app.pub="$KEYS_DIR/app.pub" \
   --dry-run=client -o yaml |
   kubeseal \
     --controller-name=sealed-secrets \
