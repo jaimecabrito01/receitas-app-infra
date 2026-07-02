@@ -6,19 +6,17 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
     - name: web
       port: 80
-      nodePort: 30080
       targetPort: web
     - name: websecure
       port: 443
-      nodePort: 30443
       targetPort: websecure
     - name: argocd
       port: 9000
-      nodePort: 30900
       targetPort: argocd
   selector:
     app: traefik
+
