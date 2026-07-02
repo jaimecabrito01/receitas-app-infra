@@ -14,5 +14,8 @@ spec:
     - name: websecure
       port: 443
       targetPort: websecure
+    - name: argocd
+      port: 9000
+      targetPort: argocd
   selector:
     app: traefik

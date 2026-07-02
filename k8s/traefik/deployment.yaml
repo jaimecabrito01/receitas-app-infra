@@ -23,6 +23,7 @@ spec:
             - --providers.kubernetescrd
             - --entrypoints.web.address=:80
             - --entrypoints.websecure.address=:443
+            - --entrypoints.argocd.address=:9000
             - --api.dashboard=true
           ports:
             - name: web
@@ -31,3 +32,5 @@ spec:
               containerPort: 443
             - name: dashboard
               containerPort: 8080
+            - name: argocd
+              containerPort: 9000

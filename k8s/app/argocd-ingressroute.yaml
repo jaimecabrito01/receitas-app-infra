@@ -1,4 +1,14 @@
 apiVersion: traefik.containo.us/v1alpha1
+kind: ServersTransport
+metadata:
+  name: argocd-transport
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  insecureSkipVerify: true
+---
+apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: argocd-dashboard
@@ -7,11 +17,12 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   entryPoints:
-    - web
+    - argocd
   routes:
     - kind: Rule
-      match: HostSNI(`*`) && PathPrefix(`/argocd`)
+      match: HostSNI(`*`)
       services:
         - name: argocd-server
           port: 443
           scheme: https
+          serversTransport: argocd-transport
