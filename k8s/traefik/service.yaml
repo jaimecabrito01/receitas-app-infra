@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
-  type: LoadBalancer
+  type: NodePort
   ports:
     - name: web
       port: 80

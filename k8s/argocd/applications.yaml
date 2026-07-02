@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:jaimecabrito01/receitas-app-infra.git
+    repoURL: https://github.com/jaimecabrito01/receitas-app-infra.git
     targetRevision: main
     path: k8s/traefik
   destination:
@@ -25,7 +25,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:jaimecabrito01/receitas-app-infra.git
+    repoURL: https://github.com/jaimecabrito01/receitas-app-infra.git
     targetRevision: main
     path: k8s/app
   destination:
