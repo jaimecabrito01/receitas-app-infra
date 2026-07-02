@@ -29,7 +29,7 @@ kubectl create secret generic jwt-keys \
   --from-file=app.pub="$KEYS_DIR/app.pub" \
   --dry-run=client -o yaml |
   kubeseal \
-    --controller-name=sealed-secrets \
+    --controller-name=sealed-secrets-controller \
     --controller-namespace=kube-system \
     --format=yaml \
     >"$SCRIPT_DIR/jwt-sealedsecret.yaml"
@@ -45,7 +45,7 @@ kubectl create secret generic postgres-credentials \
   --from-literal=password=admin123 \
   --dry-run=client -o yaml |
   kubeseal \
-    --controller-name=sealed-secrets \
+    --controller-name=sealed-secrets-controller \
     --controller-namespace=kube-system \
     --format=yaml \
     >"$SCRIPT_DIR/postgres-sealedsecret.yaml"
