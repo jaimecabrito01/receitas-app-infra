@@ -5,7 +5,7 @@ echo "=== 1. Namespace argocd ==="
 kubectl create namespace argocd 2>/dev/null || true
 
 echo "=== 2. Instalando ArgoCD ==="
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl apply --server-side -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 echo "=== 3. Aguardando ArgoCD ==="
 kubectl wait --for=condition=available --timeout=180s -n argocd deployment/argocd-server
