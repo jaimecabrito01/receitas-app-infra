@@ -1,25 +1,6 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: traefik
-  namespace: argocd
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/jaimecabrito01/receitas-app-infra.git
-    targetRevision: main
-    path: k8s/traefik
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: traefik
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
   name: receitas-app
   namespace: argocd
 spec:

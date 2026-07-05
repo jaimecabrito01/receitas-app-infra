@@ -13,12 +13,9 @@ kubectl wait --for=condition=available --timeout=180s -n argocd deployment/argoc
 echo "=== 4. Instalando SealedSecrets controller ==="
 kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/latest/download/controller.yaml
 
-echo "=== 5. Instalando CRDs do Traefik ==="
-kubectl apply -f https://raw.githubusercontent.com/traefik/traefik/v3.1/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
-
-echo "=== 6. Aplicando Applications ==="
+echo "=== 5. Aplicando Applications ==="
 kubectl apply -f k8s/argocd/applications.yaml
 
 echo ""
-echo "=== Pronto! ArgoCD esta sincronizando os Applications ==="
-echo "Para acessar o dashboard: kubectl port-forward -n argocd svc/argocd-server 8080:443"
+echo "=== Pronto! ArgoCD esta sincronizando a Application ==="
+echo "Para acessar o ArgoCD: kubectl get svc argocd-server-lb -n argocd"

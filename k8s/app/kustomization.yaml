@@ -6,7 +6,8 @@ resources:
   - deployment.yml
   - frontend.yml
   - ingressroute.yaml
-  - argocd-ingressroute.yaml
+  - dashboard-ingressroute.yaml
+  - argocd-service-lb.yaml
   - db/postgresql.yaml
   - security/jwt-sealedsecret.yaml
   - security/postgres-sealedsecret.yaml
