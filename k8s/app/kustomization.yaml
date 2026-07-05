@@ -6,6 +6,7 @@ resources:
   - deployment.yml
   - frontend.yml
   - ingressroute.yaml
+  - middleware.yaml
   - dashboard-ingressroute.yaml
   - argocd-service-lb.yaml
   - db/postgresql.yaml

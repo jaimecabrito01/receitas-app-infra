@@ -10,6 +10,13 @@ spec:
     - web
   routes:
     - kind: Rule
+      match: PathPrefix(`/api`)
+      middlewares:
+        - name: strip-api
+      services:
+        - name: receitas-app-service
+          port: 8080
+    - kind: Rule
       match: PathPrefix(`/`)
       services:
         - name: receitas-app-frontend-service
