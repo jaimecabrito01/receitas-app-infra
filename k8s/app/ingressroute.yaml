@@ -10,7 +10,7 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: HostSNI(`*`)
+      match: PathPrefix(`/`)
       services:
         - name: receitas-app-frontend-service
           port: 80

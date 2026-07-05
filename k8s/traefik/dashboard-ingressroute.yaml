@@ -10,7 +10,7 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: HostSNI(`*`) && PathPrefix(`/dashboard`)
+      match: PathPrefix(`/dashboard`)
       services:
         - name: api@internal
           kind: TraefikService

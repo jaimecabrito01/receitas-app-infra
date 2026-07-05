@@ -20,7 +20,7 @@ spec:
     - argocd
   routes:
     - kind: Rule
-      match: HostSNI(`*`)
+      match: PathPrefix(`/`)
       services:
         - name: argocd-server
           port: 443
