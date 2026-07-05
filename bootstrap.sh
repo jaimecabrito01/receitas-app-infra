@@ -10,10 +10,13 @@ kubectl apply --server-side --force-conflicts -n argocd -f https://raw.githubuse
 echo "=== 3. Aguardando ArgoCD ==="
 kubectl wait --for=condition=available --timeout=180s -n argocd deployment/argocd-server
 
-echo "=== 4. Instalando SealedSecrets controller ==="
+echo "=== 4. Criando namespace receitas-app ==="
+kubectl create namespace receitas-app 2>/dev/null || true
+
+echo "=== 5. Instalando SealedSecrets controller ==="
 kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/latest/download/controller.yaml
 
-echo "=== 5. Aplicando Applications ==="
+echo "=== 6. Aplicando Applications ==="
 kubectl apply -f k8s/argocd/applications.yaml
 
 echo ""
