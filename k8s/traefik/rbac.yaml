@@ -10,13 +10,16 @@ metadata:
   name: traefik
 rules:
   - apiGroups: [""]
-    resources: ["services", "endpoints", "secrets", "pods"]
+    resources: ["services", "endpoints", "endpointslices", "secrets", "pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["networking.k8s.io"]
     resources: ["ingresses"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["traefik.io"]
-    resources: ["ingressroutes", "middlewares", "ingressroutetcps", "ingressrouteudps", "tlsoptions", "tlsstores"]
+    resources: ["ingressroutes", "middlewares", "middlewaretcps", "ingressroutetcps", "ingressrouteudps", "serverstransports", "serverstransporttcps", "tlsoptions", "tlsstores", "traefikservices"]
     verbs: ["get", "list", "watch"]
 ---
 kind: ClusterRoleBinding
