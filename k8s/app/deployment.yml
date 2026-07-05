@@ -23,7 +23,7 @@ spec:
           image: ghcr.io/jaimecabrito01/api-receitas-backend:latest
           securityContext:              # ← adicionar estas 3 linhas
             seccompProfile:
-              type: RuntimeDefault
+              type: Unconfined
 
           ports:
             - containerPort: 8080
