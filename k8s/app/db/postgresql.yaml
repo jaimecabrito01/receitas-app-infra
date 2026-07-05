@@ -38,7 +38,7 @@ spec:
           name: postgresdb
         env:
         - name: POSTGRES_DB
-          value: "energia_db"       # Nome do banco de dados
+          value: "receitas"       # Nome do banco de dados
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
