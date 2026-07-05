@@ -21,6 +21,10 @@ spec:
       containers:
         - name: receitas-app-backend
           image: ghcr.io/jaimecabrito01/api-receitas-backend:latest
+          securityContext:              # ← adicionar estas 3 linhas
+            seccompProfile:
+              type: RuntimeDefault
+
           ports:
             - containerPort: 8080
           env:
