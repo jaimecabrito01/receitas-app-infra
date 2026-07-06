@@ -14,3 +14,4 @@ spec:
       services:
         - name: receitas-app-frontend-service
           port: 80
+   
