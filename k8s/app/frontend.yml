@@ -21,6 +21,7 @@ spec:
       containers:
         - name: receitas-app-frontend
           image: ghcr.io/jaimecabrito01/api-receitas-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
 ---
