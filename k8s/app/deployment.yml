@@ -21,6 +21,7 @@ spec:
       containers:
         - name: receitas-app-backend
           image: ghcr.io/jaimecabrito01/api-receitas-backend:latest
+          imagePullPolicy: Always
           securityContext:
             privileged: true
             seccompProfile:
