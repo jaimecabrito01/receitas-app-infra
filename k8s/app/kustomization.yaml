@@ -6,6 +6,8 @@ resources:
   - deployment.yml
   - frontend.yml
   - ingressroute.yaml
+  - ingressroute-backend.yaml
+  - middleware.yaml
   - db/postgresql.yaml
   - security/jwt-sealedsecret.yaml
   - security/postgres-sealedsecret.yaml
