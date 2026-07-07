@@ -1,80 +1,43 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: receitas-app
+  name: receitas-app-frontend
   namespace: receitas-app
   labels:
-    tier: backend
+    tier: frontend
   annotations:
     argocd.argoproj.io/sync-wave: "0"
-    description: "Backend app"
+    description: "Frontend app"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: receitas-app
+      app: receitas-app-frontend
   template:
     metadata:
       labels:
-        app: receitas-app
+        app: receitas-app-frontend
     spec:
       containers:
-        - name: receitas-app-backend
-          image: ghcr.io/jaimecabrito01/api-receitas-backend:fdf6015 # será atualizado pela pipeline
+        - name: receitas-app-frontend
+          image: ghcr.io/jaimecabrito01/api-receitas-frontend:fdf6015 
           imagePullPolicy: IfNotPresent
-
-          securityContext:
-            privileged: true
-            seccompProfile:
-              type: Unconfined
-
           ports:
-            - containerPort: 8080
+            - containerPort: 80
 
-          env:
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres-service:5432/receitas
-
-            - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-credentials
-                  key: username
-
-            - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-credentials
-                  key: password
-
-            - name: JWT_PUBLIC_KEY
-              value: file:/etc/jwt/app.pub
-
-            - name: JWT_PRIVATE_KEY
-              value: file:/etc/jwt/app.key
-
-          volumeMounts:
-            - name: jwt-keys
-              mountPath: /etc/jwt
-              readOnly: true
-
-      volumes:
-        - name: jwt-keys
-          secret:
-            secretName: jwt-keys
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: receitas-app-service
+  name: receitas-app-frontend-service
   namespace: receitas-app
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   type: ClusterIP
   selector:
-    app: receitas-app
+    app: receitas-app-frontend
 
   ports:
-    - port: 8080
-      targetPort: 8080
+    - port: 80
+      targetPort: 80
