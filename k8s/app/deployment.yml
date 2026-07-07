@@ -20,8 +20,9 @@ spec:
     spec:
       containers:
         - name: receitas-app-backend
-          image: ghcr.io/jaimecabrito01/api-receitas-backend:latest
-          imagePullPolicy: Always
+          image: ghcr.io/jaimecabrito01/api-receitas-backend:fdf6015 # será atualizado pela pipeline
+          imagePullPolicy: IfNotPresent
+
           securityContext:
             privileged: true
             seccompProfile:
@@ -29,27 +30,34 @@ spec:
 
           ports:
             - containerPort: 8080
+
           env:
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://postgres-service:5432/receitas
+
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: postgres-credentials
                   key: username
+
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: postgres-credentials
                   key: password
+
             - name: JWT_PUBLIC_KEY
               value: file:/etc/jwt/app.pub
+
             - name: JWT_PRIVATE_KEY
               value: file:/etc/jwt/app.key
+
           volumeMounts:
             - name: jwt-keys
               mountPath: /etc/jwt
               readOnly: true
+
       volumes:
         - name: jwt-keys
           secret:
@@ -64,9 +72,9 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   type: ClusterIP
-  ports:
-    - port: 8080
-      targetPort: 8080
   selector:
     app: receitas-app
 
+  ports:
+    - port: 8080
+      targetPort: 8080
